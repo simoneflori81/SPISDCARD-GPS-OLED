@@ -234,6 +234,7 @@ int main(void)
       /* Close file */
     if(f_close(&fil) != FR_OK)
       Error_Handler();
+    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
     
     /* USER CODE END WHILE */
 
