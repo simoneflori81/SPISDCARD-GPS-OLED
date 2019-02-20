@@ -1,21 +1,21 @@
-"C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Middlewares\Third_Party\FatFs\src\diskio.c"
+"C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Middlewares\Third_Party\FatFs\src\diskio.c"
 -std=c11
 -ferror-limit=0
 -fbracket-depth=512
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Middlewares\Third_Party\FatFs\src
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Middlewares\Third_Party\FatFs\src
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\EWARM/../Inc
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\EWARM/../Inc
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\EWARM/../Drivers/STM32F4xx_HAL_Driver/Inc/Legacy
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\EWARM/../Middlewares/Third_Party/FatFs/src
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\EWARM/../Middlewares/Third_Party/FatFs/src
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\EWARM/../Drivers/CMSIS/Device/ST/STM32F4xx/Include
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\EWARM/../Drivers/CMSIS/Device/ST/STM32F4xx/Include
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\EWARM/../Drivers/CMSIS/Include
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\EWARM/../Drivers/CMSIS/Include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I
@@ -25,17 +25,17 @@ C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\inc\c
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Inc
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Inc
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Drivers\STM32F4xx_HAL_Driver\Inc
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Drivers\STM32F4xx_HAL_Driver\Inc
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Drivers\STM32F4xx_HAL_Driver\Inc\Legacy
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Middlewares\Third_Party\FatFs\src
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Middlewares\Third_Party\FatFs\src
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Drivers\CMSIS\Device\ST\STM32F4xx\Include
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Drivers\CMSIS\Device\ST\STM32F4xx\Include
 -I
-C:\Users\AUAVT\Desktop\STM32\SPISDCARD - Copy\Drivers\CMSIS\Include
+C:\Users\AUAVT\Desktop\STM32\SPISDCARD - GPS - OLED\Drivers\CMSIS\Include
 -I
 C:\Program Files (x86)\IAR Systems\Embedded Workbench 8.2\arm\CMSIS\Core\Include
 -I

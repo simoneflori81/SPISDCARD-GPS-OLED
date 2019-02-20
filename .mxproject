@@ -1,7 +1,7 @@
 [PreviousGenFiles]
-HeaderPath=C:/Users/AUAVT/Desktop/STM32/SPISDCARD - Copy/Inc
+HeaderPath=C:/Users/AUAVT/Desktop/STM32/SPISDCARD - GPS - OLED/Inc
 HeaderFiles=ffconf.h;user_diskio.h;fatfs.h;stm32f4xx_it.h;stm32f4xx_hal_conf.h;main.h;
-SourcePath=C:/Users/AUAVT/Desktop/STM32/SPISDCARD - Copy/Src
+SourcePath=C:/Users/AUAVT/Desktop/STM32/SPISDCARD - GPS - OLED/Src
 SourceFiles=user_diskio.c;fatfs.c;stm32f4xx_it.c;stm32f4xx_hal_msp.c;main.c;
 
 [PreviousLibFiles]

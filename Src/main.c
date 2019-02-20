@@ -93,6 +93,8 @@ DWORD fre_clust;
 uint32_t total, freem;
 char buffer[100];
 volatile uint8_t Timer1, Timer2;
+volatile char sd_write_ok = '!';
+volatile uint32_t ConvertedValue = 0;
 
 char rawgps[162]; //Received raw data from GPS module through UART1
 char collection[20][128];
@@ -137,21 +139,23 @@ int main(void)
   SystemClock_Config();
 
   /* USER CODE BEGIN SysInit */
+  
+  /* USER CODE END SysInit */
+
+  /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_SPI1_Init();
   MX_FATFS_Init();
   MX_I2C2_Init();
   MX_USART1_UART_Init();
   MX_ADC1_Init();
-  ssd1306_Init();
-  /* USER CODE END SysInit */
-
-  /* Initialize all configured peripherals */
-  
   /* USER CODE BEGIN 2 */
+  ssd1306_Init();
+  
+  
   /* Mount SD Card */
   if(f_mount(&fs, "", 0) != FR_OK)
-    Error_Handler();
+    sd_write_ok = '!';
   
 //  /* Open file to write */
 //  if(f_open(&fil, "gpsdata.txt", FA_OPEN_ALWAYS | FA_READ | FA_WRITE) != FR_OK)
@@ -210,31 +214,43 @@ int main(void)
   
   while (1)
   {
+    if(HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13) == 0){
+      //unmount when user button is pressed, then is safe to remove card
+      f_mount(NULL, "", 1);
+    }
     HAL_UART_Receive(&huart1, (uint8_t*)rawgps, sizeof(rawgps), 1000);
     /* decode NMEA and save in collection[][] */
     gpsparser(rawgps, "GPGGA");
     //gpsparser(rawgps, "GPGGA");
+    HAL_ADC_Start(&hadc1);
+    ConvertedValue = HAL_ADC_GetValue(&hadc1);
+      
     oledprintGPGGA1(collection);
     /* Open file to write */
-
-    if(f_open(&fil, "gpsdata.txt", FA_OPEN_APPEND | FA_READ | FA_WRITE) != FR_OK)
-      Error_Handler();
-    f_puts(collection[1], &fil);
-    f_puts(",", &fil);
-    f_puts(collection[2], &fil);
-    f_puts(",", &fil);
-    f_puts(collection[3], &fil);
-    f_puts(",", &fil);
-    f_puts(collection[4], &fil);
-    f_puts(",", &fil);
-    f_puts(collection[5], &fil);
-    f_puts(",", &fil);
-    f_puts(collection[9], &fil);
-    f_puts("\n", &fil);
+    sd_write_ok = '!';
+    if(f_open(&fil, "gpsdata.txt", FA_OPEN_APPEND | FA_WRITE) != FR_OK){
+      sd_write_ok = '!';
+    }
+    else{
+      f_puts(collection[1], &fil);
+      f_puts(",", &fil);
+      f_puts(collection[2], &fil);
+      f_puts(",", &fil);
+      f_puts(collection[3], &fil);
+      f_puts(",", &fil);
+      f_puts(collection[4], &fil);
+      f_puts(",", &fil);
+      f_puts(collection[5], &fil);
+      f_puts(",", &fil);
+      f_puts(collection[9], &fil);
+      f_puts("\n", &fil);
       /* Close file */
-    if(f_close(&fil) != FR_OK)
-      Error_Handler();
-    HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+      if(f_close(&fil) != FR_OK){
+        sd_write_ok = '!';
+      }
+      sd_write_ok = '@';
+    }
+    
     
     /* USER CODE END WHILE */
 
@@ -307,15 +323,15 @@ static void MX_ADC1_Init(void)
   /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
   */
   hadc1.Instance = ADC1;
-  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV2;
-  hadc1.Init.Resolution = ADC_RESOLUTION_12B;
-  hadc1.Init.ScanConvMode = DISABLE;
-  hadc1.Init.ContinuousConvMode = DISABLE;
+  hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV8;
+  hadc1.Init.Resolution = ADC_RESOLUTION_8B;
+  hadc1.Init.ScanConvMode = ENABLE;
+  hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
-  hadc1.Init.NbrOfConversion = 1;
+  hadc1.Init.NbrOfConversion = 3;
   hadc1.Init.DMAContinuousRequests = DISABLE;
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   if (HAL_ADC_Init(&hadc1) != HAL_OK)
@@ -327,6 +343,20 @@ static void MX_ADC1_Init(void)
   sConfig.Channel = ADC_CHANNEL_0;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
+  sConfig.Rank = 2;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
+  sConfig.Rank = 3;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -457,16 +487,12 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, GPIO_PIN_RESET);
-
-  /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);
 
   /*Configure GPIO pin : PC13 */
   GPIO_InitStruct.Pin = GPIO_PIN_13;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  GPIO_InitStruct.Mode = GPIO_MODE_INPUT;
+  GPIO_InitStruct.Pull = GPIO_PULLUP;
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pin : SD_CS_Pin */

@@ -20,7 +20,7 @@
         <LeaveTargetRunning>_ 0</LeaveTargetRunning>
     </StLinkDriver>
     <DebugChecksum>
-        <Checksum>2400192215</Checksum>
+        <Checksum>1335925076</Checksum>
     </DebugChecksum>
     <Exceptions>
         <StopOnUncaught>_ 0</StopOnUncaught>

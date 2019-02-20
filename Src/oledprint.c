@@ -2,11 +2,17 @@
 #include "ssd1306_fonts.h"
 
 static char buff[40]; //buffer for OLED Display
+extern volatile char sd_write_ok;
+extern volatile uint32_t ConvertedValue;
+char ConvertedValueString[3];
+
+
 
 void oledprintGPGGA1(char collection[][128]){
   ssd1306_Fill(Black);
+  sprintf( ConvertedValueString, "%u", ConvertedValue);
   
-  snprintf(buff, sizeof(buff), "UTC:%s ", collection[1]); //time
+  snprintf(buff, sizeof(buff), "UTC:%s %c", collection[1], sd_write_ok); //time
   ssd1306_SetCursor(2, 2);
   ssd1306_WriteString(buff, Font_7x10, White);
   
@@ -26,7 +32,7 @@ void oledprintGPGGA1(char collection[][128]){
   ssd1306_WriteString(buff, Font_7x10, White);
   
   
-  snprintf(buff, sizeof(buff), "Elv:%s ", collection[9]); //Elev 
+  snprintf(buff, sizeof(buff), "Elv:%s V: %s", collection[9], ConvertedValueString); //Elev 
   ssd1306_SetCursor(2, 50);
   ssd1306_WriteString(buff, Font_7x10, White); 
   
