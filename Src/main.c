@@ -58,6 +58,7 @@
 #include "ssd1306.h"
 #include "oledprint.h"
 #include "gpsparser.h"
+#include "math.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -94,10 +95,20 @@ uint32_t total, freem;
 char buffer[100];
 volatile uint8_t Timer1, Timer2;
 volatile char sd_write_ok = '!';
-volatile uint32_t ConvertedValue = 0;
+uint32_t ConvertedValue = 0;
+float reading = 0, average = 2000;
+char ConvertedValueString[3] = {0};
+float Vx, Rs, Ro; //Voltage at CH4 sensor
+float ratio;
+float ppm_log, ppm;
+
+const float m = -0.318; //Slope
+const float b = 1.133;  //Intersept
+
 
 char rawgps[162]; //Received raw data from GPS module through UART1
 char collection[20][128];
+char buffc[50];
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -151,6 +162,37 @@ int main(void)
   MX_ADC1_Init();
   /* USER CODE BEGIN 2 */
   ssd1306_Init();
+  
+  //Calibration CH4
+  //Read value from analog pin (10 bits)
+  ssd1306_Fill(Black);
+  snprintf(buffc, sizeof(buffc), "CALIBRATION"); //time
+  ssd1306_SetCursor(25, 16);
+  ssd1306_WriteString(buffc, Font_7x10, White);
+  snprintf(buffc, sizeof(buffc), "Fresh Air.."); //time
+  ssd1306_SetCursor(25, 30);
+  ssd1306_WriteString(buffc, Font_7x10, White);
+  ssd1306_UpdateScreen();
+  
+  for(int j=0; j<2000; j++){
+    HAL_ADC_Start(&hadc1);
+    reading += HAL_ADC_GetValue(&hadc1);
+  }
+  //ConvertedValue = (uint32_t) (reading / average);
+  
+  Vx = ((reading / average)/1023.0)*3.3;
+  Rs = (10*3.3)/Vx - 10;
+  Ro = Rs / 4.4;
+  
+  HAL_Delay(1000);
+  
+  ssd1306_Fill(Black);
+  snprintf(buffc, sizeof(buffc), "-DONE-"); //time
+  ssd1306_SetCursor(35, 24);
+  ssd1306_WriteString(buffc, Font_7x10, White);
+  ssd1306_UpdateScreen();
+  
+  HAL_Delay(1500);
   
   
   /* Mount SD Card */
@@ -224,6 +266,15 @@ int main(void)
     //gpsparser(rawgps, "GPGGA");
     HAL_ADC_Start(&hadc1);
     ConvertedValue = HAL_ADC_GetValue(&hadc1);
+    //Calculate ppm from previous Rs in fresh air
+    Vx = (ConvertedValue/1023.0)*3.3;
+    Rs = (10*3.3)/Vx - 10; //Now is Rs in gas environment
+    ratio = Rs / Ro;
+    ppm_log = (log10f(ratio) - b) / m;
+    ppm = powf(10.0, ppm_log);
+    
+    sprintf(ConvertedValueString, "%u", (uint32_t)ppm);
+
       
     oledprintGPGGA1(collection);
     /* Open file to write */
@@ -242,7 +293,11 @@ int main(void)
       f_puts(",", &fil);
       f_puts(collection[5], &fil);
       f_puts(",", &fil);
+      f_puts(collection[7], &fil);
+      f_puts(",", &fil);
       f_puts(collection[9], &fil);
+      f_puts(",", &fil);
+      f_puts(ConvertedValueString, &fil);
       f_puts("\n", &fil);
       /* Close file */
       if(f_close(&fil) != FR_OK){
@@ -324,7 +379,7 @@ static void MX_ADC1_Init(void)
   */
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV8;
-  hadc1.Init.Resolution = ADC_RESOLUTION_8B;
+  hadc1.Init.Resolution = ADC_RESOLUTION_10B;
   hadc1.Init.ScanConvMode = ENABLE;
   hadc1.Init.ContinuousConvMode = ENABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;

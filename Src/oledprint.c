@@ -4,13 +4,13 @@
 static char buff[40]; //buffer for OLED Display
 extern volatile char sd_write_ok;
 extern volatile uint32_t ConvertedValue;
-char ConvertedValueString[3];
+extern char ConvertedValueString[3];
 
 
 
 void oledprintGPGGA1(char collection[][128]){
   ssd1306_Fill(Black);
-  sprintf( ConvertedValueString, "%u", ConvertedValue);
+
   
   snprintf(buff, sizeof(buff), "UTC:%s %c", collection[1], sd_write_ok); //time
   ssd1306_SetCursor(2, 2);
@@ -27,12 +27,12 @@ void oledprintGPGGA1(char collection[][128]){
   ssd1306_WriteString(buff, Font_7x10, White);
   
   
-  snprintf(buff, sizeof(buff), "Sat:%s ", collection[7]); //Sat #
+  snprintf(buff, sizeof(buff), "Sat:%s  PPM:%s", collection[7], ConvertedValueString); //Sat #
   ssd1306_SetCursor(2, 38);
   ssd1306_WriteString(buff, Font_7x10, White);
   
   
-  snprintf(buff, sizeof(buff), "Elv:%s V: %s", collection[9], ConvertedValueString); //Elev 
+  snprintf(buff, sizeof(buff), "Elv:%s ", collection[9]); //Elev 
   ssd1306_SetCursor(2, 50);
   ssd1306_WriteString(buff, Font_7x10, White); 
   
